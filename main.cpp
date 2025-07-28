@@ -8,9 +8,6 @@
 
 using namespace std;
 
-struct BaseConstants {
-    const string END_MESSAGE = "\n";
-};
 
 struct IntConstants {
     public:
