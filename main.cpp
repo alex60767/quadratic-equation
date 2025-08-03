@@ -4,7 +4,7 @@
 #include <string>
 #include <cmath>
 #include <algorithm>
-
+#include <iomanip>
 
 using namespace std;
 
@@ -83,7 +83,7 @@ const int SolutionTypeConstants::TwoRootsComplex = 5;
 
 struct OutputConstants {
     static constexpr const char* SOLUTION_HEADER = "Решение уравнения:";
-    static constexpr const char* NO_ROOTS_MSG = "Уравнение не имеет действительных корней.";
+    static constexpr const char* NO_ROOTS_MSG = "Уравнение не имеет корней.";
     static constexpr const char* ANY_ROOTS_MSG = "Уравнение имеет бесконечно много решений (любое x).";
     static constexpr const char* SINGLE_ROOT_HEADER = "Уравнение имеет один действительный корень:";
     static constexpr const char* TWO_ROOTS_HEADER = "Уравнение имеет два различных корня:";
@@ -98,6 +98,7 @@ struct OutputConstants {
     static constexpr const char* IMAGINARY_UNIT = "i";
     static constexpr const char* END_MESSAGE = "\n";
     static constexpr const char* SPACE = " ";
+    static constexpr const char* ERR = "Error: ";
 };
 
 struct ErrorConstants {
@@ -166,6 +167,10 @@ double get_b(const InputCoefficients& ic) {
 
 double get_c(const InputCoefficients& ic) {
     return ic.c;
+}
+
+double get_discriminant(const InputCoefficients& ic){
+    return get_b(ic) * get_b(ic) - FloatConstants::FOUR * get_a(ic) * get_c(ic);
 }
 
 InputCoefficients set_a(InputCoefficients& ic, double value) {
@@ -301,14 +306,14 @@ Solution solve_quadratic_b_not_zero_c_not_zero_zero_discriminant(const InputCoef
 }
 
 Solution solve_quadratic_b_not_zero_c_not_zero_positive_discriminant(const InputCoefficients& ic) {
-    double discriminant = get_b(ic) * get_b(ic) - FloatConstants::FOUR * get_a(ic) * get_c(ic);  // TODO DRY
+    double discriminant = get_discriminant(ic);
     double x1 = (-get_b(ic) + sqrt(discriminant)) / (FloatConstants::TWO * get_a(ic));
     double x2 = (-get_b(ic) - sqrt(discriminant)) / (FloatConstants::TWO * get_a(ic));
     return createSolution(create_compl(x1, FloatConstants::ZERO), create_compl(x2, FloatConstants::ZERO), REAL_AND_DISTINCT_ROOTS);
 }
 
 Solution solve_quadratic_b_not_zero_c_not_zero(const InputCoefficients& ic) {
-    double discriminant = get_b(ic) * get_b(ic) - FloatConstants::FOUR * get_a(ic) * get_c(ic); // TODO DRY
+    double discriminant = get_discriminant(ic);
     if (discriminant < FloatConstants::ZERO) {
         return solve_quadratic_b_not_zero_c_not_zero_negative_discriminant(ic, discriminant);
     } else if (is_zero(discriminant)) {
@@ -378,9 +383,35 @@ Solution solve_equation(const InputCoefficients& ic) {
     }
 }
 
+string form_real(double value) {
+    return to_string(value);
+}
+
+string form_imaginary(double value) {
+    string result;
+    if (value >= IntConstants::ZERO) {
+        result += OutputConstants::IMAGINARY_PART_FORMAT;
+    }
+    result += to_string(value) + OutputConstants::IMAGINARY_UNIT;
+    return result;
+}
+
+string format_complex(const ComplexNum& num) {
+    if (is_zero(num.imag)) {
+        return form_real(num.real);
+    } 
+    if (is_zero(num.real)) {
+        return form_imaginary(num.imag);
+    }
+    return form_real(num.real) + OutputConstants::SPACE + form_imaginary(num.imag);
+}
+
+void out_on_screen(const string& s) {
+    cout << s << OutputConstants::END_MESSAGE;
+}
 
 void output_error(const Solution& s) {
-    out_on_screen("Error: " + s.error);
+    out_on_screen(OutputConstants::ERR + s.error);
 }
 
 void output_any_roots() {
@@ -415,22 +446,6 @@ void output_complex_roots(const Solution& s) {
 
 void output_unknown_solution() {
     out_on_screen(OutputConstants::UNKNOWN_SOLUTION_MSG);
-}
-
-void out_on_screen(const string& s) {
-    cout << s << OutputConstants::END_MESSAGE;
-}
-
-string format_complex(const ComplexNum& num) {
-    if (is_zero(num.imag)) { // TODO to abstract
-        return to_string(num.real); // TODO to abstract
-    } else if (is_zero(num.real)) { // TODO to abstract
-        return to_string(num.imag) + OutputConstants::IMAGINARY_UNIT; // TODO to abstract
-    } else {
-        return to_string(num.real) + OutputConstants::SPACE +
-               (num.imag >= IntConstants::ZERO ? OutputConstants::IMAGINARY_PART_FORMAT : "") +
-               to_string(num.imag) + OutputConstants::IMAGINARY_UNIT; // TODO to abstract
-    } 
 }
 
 
