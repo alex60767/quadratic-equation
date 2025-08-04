@@ -1,21 +1,8 @@
 # quadratic-equation-cpp
 
-Quadratic Equation Solver in C++
-This is a simple C++ program that solves quadratic equations of the form:
+## Update - 03/08/25
 
-text
-ax² + bx + c = 0
-Features
-Calculates real roots of quadratic equations
+- Completed all but one of the to-do tasks.
+- Fixed `NO_ROOTS_MSG` to display a more accurate message.
+- Replaced some code blocks to improve compatibility with VSCode.
 
-Handles cases with:
-1) Two distinct real roots
-2) One real root (double root)
-3)Complex roots
-
-User-friendly console interface
-
-Requirements
-C++ compiler (g++, clang++, or MSVC)
-
-CMake (optional, for building)
